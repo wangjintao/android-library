@@ -1,1 +1,1 @@
-# android-library
+# Android MapBox Library
