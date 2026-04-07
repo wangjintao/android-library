@@ -202,6 +202,50 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
      */
     fun updateCircleColor(element: OptElement.CircleOptElement, newColor: Int)
 ```
+### 8.添加线
+* #### 添加一条线
+```kotlin
+    /**
+     * 添加一条线
+     * @param points 要添加的线的点集
+     * @param color 要添加的线的颜色
+     * @param width 要添加的线的宽度
+     * @return 所添加的线，方便后续对其进行操作
+     */
+    fun addLine(points: List<Point>, color: Int = Color.BLUE, width: Double = 3.0): OptElement.LineOptElement? 
+```
+* #### 添加多条线
+```kotlin
+    /**
+     * 添加多条线
+     * @param lines 要添加的多条线的集合
+     * @param color 线的颜色
+     * @param width 线的宽度
+     * @return 所添加的线的集合
+     */
+    fun addLines(lines: List<List<Point>>, color: Int = Color.BLUE,
+        width: Double = 3.0): MutableList<OptElement.LineOptElement> 
+```
+
+### 9.线后加点（延长）
+```kotlin
+   /**
+     * 在线后加一个点（线变长）
+     * @param element 操作的线
+     * @param newPoint 新添加的点
+     */
+    fun appendPoint(element: OptElement.LineOptElement, newPoint: Point)
+```
+### 10.修改线的样式（颜色和粗细）
+```kotlin
+    /**
+     * 修改线的样式（颜色和宽度）
+     * @param element 要修改的线
+     * @param color 修改成的颜色
+     * @param width 修改成的宽度
+     */
+    fun updateLineStyle(element: OptElement.LineOptElement, color: Int? = null, width: Double? = null) 
+```
 
 
 ## 部分参数说明
