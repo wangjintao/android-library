@@ -246,6 +246,48 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
      */
     fun updateLineStyle(element: OptElement.LineOptElement, color: Int? = null, width: Double? = null) 
 ```
+### 11.添加多边形
+* #### 添加一个多边形
+```kotlin
+    /**
+     * 添加一个多边形
+     * @param polygonData 要添加的多边形的bean
+     * @return 添加的多边形对象，方便后续操作
+     */
+    fun addPolygon(polygonData: PolygonData): OptElement.PolygonOptElement? 
+```
+* #### 添加多个多边形
+```kotlin
+    /**
+     * 添加多个多边形
+     * @param polygonsData 要添加的多边形的bean的集合
+     * @return 添加的多边形集合，方便后续操作
+     */
+    fun addPolygons(polygonsData: List<PolygonData>): MutableList<OptElement.PolygonOptElement> 
+```
+### 12.修改多边形填充色
+```kotlin
+    /**
+     * 修改填充颜色
+     * @param element 要修改的多边形
+     * @param newColor 要修改的颜色
+     */
+    fun updatePolygonFillColor(element: OptElement.PolygonOptElement, newColor: Int) 
+```
+### 13.修改多边形外边线宽和颜色
+```kotlin
+    /**
+     * 修改外边颜色和线宽
+     * @param element 要修改的元素
+     * @param strokeWidth 修改成的线宽，不传不修改
+     * @param strokeColor 修改成的颜色，不传不修改
+     */
+    fun updatePolygonStrokeWidthAndColor(element: OptElement.PolygonOptElement, strokeWidth: Double? = null,
+        strokeColor: Int? = null) 
+```
+### 14.点击事件
+在调用`initMapBox`时传入`onMapClickListener`即可，返回[`MapClickResult`](#点击回调)
+详细使用参考[MapboxDemo](https://github.com/wangjintao/MapboxDemo.git)
 
 
 ## 部分参数说明
@@ -294,3 +336,17 @@ data class ObstaclePolygon(
     val color: Int//颜色
 ) : Obstacle()
 ```
+
+### 4.<span id="点击回调">`MapClickResult`</span>
+```kotlin
+data class MapClickResult(
+    val point: Point?,           // 点击位置
+    val element: OptElement?,    // 命中的元素
+    val feature: Feature?     // 原始Feature（调试/扩展用）
+)
+```
+## 版本信息
+* ### V1.0.0
+#### 1.提供地图初始化方法
+#### 2.提供往地图添加和修改元素的方法，包括图片，圆点，线，多边形。其中多边形内部可添加实心障碍物
+#### 3.提供点击事件
