@@ -2,7 +2,7 @@
 
 这个库是基于MapBox SDK V11开发的地图管理工具，简化使用流程
 
-## 集成方法
+## 集成方法(V1.1.0)
 
 ### 1. 在app的res/values/string.xml里添加MapBox的Token
 
@@ -75,8 +75,7 @@ private val mapBox: MapBox by lazy { MapBox() }
 
 ## 支持的功能
 
-目前支持在地图上操作以下几种元素：图片（ImageOptElement），圆点（CircleOptElement），线（LineOptElement），多边形（PolygonOptElement）。但是多边形里边可能有一些形状要显示，这里命名为障碍物（PolygonObstacleElement），
-障碍物是依赖于多边形存在的。障碍物分为两类，分别是圆形障碍物（ObstacleCircle）和多边形障碍物（ObstaclePolygon）。其中障碍物都是实心的形状
+目前支持在地图上操作以下几种元素：图片（ImageOptElement），圆点（CircleOptElement），线（LineOptElement），多边形（PolygonOptElement）,块（LumpOptElement）。块分为两类，分别是圆形和多边形，需要通过不同的添加方法进行添加，其中块都是实心的形状
 
 ### 1. 显示地图
 
@@ -130,7 +129,7 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
      * @param element 要修改的元素
      * @param newPosition 要更新到的位置
      */
-    fun updateImage(element: OptElement.ImageOptElement, newPosition: Point)
+    fun updateImagePosition(element: OptElement.ImageOptElement, newPosition: Point)
 ```
 * #### 修改图片大小
 ```kotlin
@@ -234,7 +233,7 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
      * @param element 操作的线
      * @param newPoint 新添加的点
      */
-    fun appendPoint(element: OptElement.LineOptElement, newPoint: Point)
+    fun appendLinePoint(element: OptElement.LineOptElement, newPoint: Point)
 ```
 ### 10.修改线的样式（颜色和粗细）
 ```kotlin
@@ -250,20 +249,28 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
 * #### 添加一个多边形
 ```kotlin
     /**
-     * 添加一个多边形
-     * @param polygonData 要添加的多边形的bean
-     * @return 添加的多边形对象，方便后续操作
-     */
-    fun addPolygon(polygonData: PolygonData): OptElement.PolygonOptElement? 
+ * 添加一个多边形
+ * @param outer 要添加的多边形的外边点集
+ * @param strokeColor 要添加的多边形的外边颜色
+ * @param strokeWidth 要添加的多边形的外边宽度
+ * @param fillColor 要添加的多边形的填充色
+ * @return 添加的多边形对象，方便后续操作
+ */
+fun addPolygon(outer: List<Point>, strokeColor: Int = Color.BLUE, strokeWidth: Double = 2.0,
+    fillColor: Int? = null): OptElement.PolygonOptElement? 
 ```
 * #### 添加多个多边形
 ```kotlin
     /**
-     * 添加多个多边形
-     * @param polygonsData 要添加的多边形的bean的集合
-     * @return 添加的多边形集合，方便后续操作
-     */
-    fun addPolygons(polygonsData: List<PolygonData>): MutableList<OptElement.PolygonOptElement> 
+ * 添加多个多边形
+ * @param polygons 要添加的多边形的外边点集
+ * @param strokeColor 要添加的多边形的外边颜色
+ * @param strokeWidth 要添加的多边形的外边宽度
+ * @param fillColor 要添加的多边形的填充色
+ * @return 添加的多边形集合，方便后续操作
+ */
+fun addPolygons(polygons: List<List<Point>>, strokeColor: Int = Color.BLUE, strokeWidth: Double = 2.0,
+    fillColor: Int? = null): MutableList<OptElement.PolygonOptElement> 
 ```
 ### 12.修改多边形填充色
 ```kotlin
@@ -285,7 +292,39 @@ mapBox.initMapBox(mViewBinding.mapView, scope = lifecycleScope)
     fun updatePolygonStrokeWidthAndColor(element: OptElement.PolygonOptElement, strokeWidth: Double? = null,
         strokeColor: Int? = null) 
 ```
-### 14.点击事件
+### 14.添加多边形块
+```kotlin
+/**
+     * 添加多边形块
+     * @param points 要添加的多边形块的点集
+     * @param color 要添加的多边形块的颜色
+     */
+    fun addPolygonLump(points: List<Point>, color: Int = Color.RED): OptElement.LumpOptElement?
+```
+### 15.添加圆形块
+```kotlin
+ /**
+     * 添加圆形块
+     * @param center 要添加的圆形块的圆心位置
+     * @param radiusMeter 要添加的圆形块的半径
+     * @param color 要添加的多边形块的颜色
+     */
+    fun addCircleLump(center: Point, radiusMeter: Double, color: Int = Color.RED): OptElement.LumpOptElement?
+```
+### 16.修改块的颜色
+```kotlin
+ /**
+     * 修改块的颜色
+     * @param element 要操作的对象
+     * @param color 要修改成的颜色
+     */
+    fun updateLumpColor(element: OptElement.LumpOptElement, color: Int)
+```
+### 17.清除地图上所有元素
+```kotlin
+fun clear()
+```
+### 18.点击事件
 在调用`initMapBox`时传入`onMapClickListener`即可，返回[`MapClickResult`](#点击回调)
 详细使用参考[MapboxDemo](https://github.com/wangjintao/MapboxDemo.git)
 
@@ -318,26 +357,7 @@ data class MapClickResult(
 )
 ```
 
-### 3.`ObstacleCircle`
-
-```kotlin
-data class ObstacleCircle(
-    val center: Point,//中心点
-    val diameter: Double,//直径
-    val color: Int//颜色
-) : Obstacle()
-```
-
-### 4. `ObstaclePolygon`
-
-```kotlin
-data class ObstaclePolygon(
-    val points: List<Point>,//外圈点集
-    val color: Int//颜色
-) : Obstacle()
-```
-
-### 4.<span id="点击回调">`MapClickResult`</span>
+### 3.<span id="点击回调">`MapClickResult`</span>
 ```kotlin
 data class MapClickResult(
     val point: Point?,           // 点击位置
@@ -346,7 +366,10 @@ data class MapClickResult(
 )
 ```
 ## 版本信息
-* ### V1.0.0
-#### 1.提供地图初始化方法
-#### 2.提供往地图添加和修改元素的方法，包括图片，圆点，线，多边形。其中多边形内部可添加实心障碍物
-#### 3.提供点击事件
+* ### V1.1.0
+#### 1.解耦多边形，拆分出块（Lump）这一元素
+#### 2.统一方法命名
+* ### [V1.0.0](https://github.com/wangjintao/android-library/wiki/doc%E2%80%90v1.0.0)
+## 关于作者
+**作者：王金涛**<br>
+**邮箱：wangjintao1988@163.com**
